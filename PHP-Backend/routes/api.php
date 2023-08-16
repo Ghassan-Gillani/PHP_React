@@ -3,6 +3,8 @@
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\EmployeeController;
+use App\Http\Controllers\QueueController;
+
 
 /*
 |--------------------------------------------------------------------------
@@ -25,6 +27,11 @@ Route::post('/save',[App\Http\Controllers\EmployeeController::class, 'store']);
 Route::put('/update/{id}',[App\Http\Controllers\EmployeeController::class, 'update']);
 
 Route::delete('/delete/{id}',[App\Http\Controllers\EmployeeController::class, 'destroy']);
+
+
+Route::post('/add-to-queue', [QueueController::class, 'addToQueue']);
+Route::get('/process-queue', [QueueController::class, 'processQueue']);
+
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
