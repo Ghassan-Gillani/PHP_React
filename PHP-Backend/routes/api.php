@@ -29,9 +29,10 @@ Route::put('/update/{id}',[App\Http\Controllers\EmployeeController::class, 'upda
 Route::delete('/delete/{id}',[App\Http\Controllers\EmployeeController::class, 'destroy']);
 
 
-Route::post('/add-to-queue', [QueueController::class, 'addToQueue']);
-Route::get('/process-queue', [QueueController::class, 'processQueue']);
 
+Route::post('/queue/{queueName}', [QueueController::class, 'createQueue']);
+Route::post('/queue/{queueName}/add', [QueueController::class, 'addToQueue']);
+Route::get('/queue/{queueName}/process', [QueueController::class, 'processQueue']);
 
 
 Route::middleware('auth:sanctum')->get('/user', function (Request $request) {

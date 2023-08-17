@@ -7,30 +7,52 @@ use SplQueue;
 
 class QueueController extends Controller
 {
-    protected $queue;
+    protected $queues;
 
     public function __construct()
     {
-        $this->queue = new SplQueue();
+        $this->queues = new Collection();
     }
 
-    public function addToQueue(Request $request)
+    public function createQueue(Request $request, $queueName)
     {
-        $data = $request->only(['name', 'address', 'mobile']);
-        $this->queue->enqueue($data);
-        
-        return response()->json(['message' => 'Added to queue']);
-    }
-
-    public function processQueue()
-    {
-        $processed = [];
-
-        while (!$this->queue->isEmpty()) {
-            $data = $this->queue->dequeue();
-            $processed[] = $data;
+        if (!$this->queues->has($queueName)) {
+            $this->queues->put($queueName, new \SplQueue());
+            return response()->json(['message' => "Queue '$queueName' created"]);
+        } else {
+            return response()->json(['message' => "Queue '$queueName' already exists"]);
         }
+    }
 
-        return response()->json(['message' => 'Processed queue', 'data' => $processed]);
+    public function addToQueue(Request $request, $queueName)
+    {
+        if ($this->queues->has($queueName)) {
+            $queue = $this->queues->get($queueName);
+            $data = $request->only(['name', 'address', 'mobile']);
+            $queue->enqueue($data);
+
+            return response()->json(['message' => "Added to queue '$queueName'"]);
+        } else {
+            return response()->json(['message' => "Queue '$queueName' not found"], 404);
+        }
+    }
+
+    public function processQueue(Request $request, $queueName)
+    {
+        if ($this->queues->has($queueName)) {
+            $queue = $this->queues->get($queueName);
+            $processed = [];
+
+            while (!$queue->isEmpty()) {
+                $data = $queue->dequeue();
+                $processed[] = $data;
+            }
+
+            return response()->json(['message' => "Processed queue '$queueName'", 'data' => $processed]);
+        } else {
+            return response()->json(['message' => "Queue '$queueName' not found"], 404);
+        }
+    }
+
     }
 }
